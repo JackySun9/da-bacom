@@ -74,7 +74,15 @@ npx playwright test nala/blocks/video-marquee nala/blocks/bacom-elastic-carousel
 
 Cross-browser spot checks: swap `--project` for `da-bacom-live-webkit` (Safari) or `da-bacom-live-firefox`.
 
-**Current status:** ✅ **29/30 passing** on `da-bacom-live-chromium` — verified on **both** the dedicated block pages and the integration page (2026-08-27). **1 bento-grid test is red by design** — the Figma-confirmed secondary-card grey background is still missing **on desktop** (mobile is already grey); see §1.2b. The earlier card-radius gap is now **fixed on stage** (`@bento-grid-card-radius` green).
+**Current status:** ✅ verified 2026-08-27 on the dedicated block pages **and** the integration page (via `ISWA_INTEGRATION_PAGE`), across three viewports:
+
+| Project | Result | Reds |
+|---------|--------|------|
+| `da-bacom-live-chromium` (desktop 1440) | **29/30** | bento secondary-bg (design lock, §1.2b) |
+| `da-bacom-live-tablet` (iPad Mini 768) | **29/30** | bento secondary-bg (design lock) |
+| `mobile-chrome-pixel5` (393) | **28/30** | bento secondary-bg (design lock) + **marquee logo distorted on mobile (bug, §5)** |
+
+The earlier card-radius gap is now **fixed on stage** (`@bento-grid-card-radius` green). The suites are viewport-aware: bento/elastic pick the active responsive view per breakpoint (mobile <600, tablet 600–1199, desktop ≥1200).
 
 ### 1.2b Bento — Figma-confirmed spec-lock (red until built)
 
@@ -176,6 +184,8 @@ stage pages. (The detailed per-interaction template lives in
 
 ## 5. Known gaps / risks
 
+- **Marquee logo distorted on mobile (bug to fix)** — the eyebrow logo is hard-sized `168×20` while its asset is `508×120` (4.23:1), i.e. ~2× horizontal stretch. Desktop is only ~4% off (300×30 vs 303×29). Fix: size by one dimension (`height` + `width: auto` or `aspect-ratio`). Caught by `@video-marquee-logo`.
+- **Elastic carousel on mobile stacks vertically** — the current build lays the cards out as a full-width single-column grid (no horizontal swipe, controls hidden). An earlier QE note expected a swipe carousel on mobile; deviation to confirm with design/PM (encoded by `@elastic-carousel-nav`'s mobile branch).
 - Analytics attributes (`daa-*`) not asserted.
 - Card counts / `start-index` rotation are content-driven — suites assert lower bounds, not fixed counts.
 - Visual regression (pixel diffing) is out of scope; parity is by review (§3) + manual (§4).

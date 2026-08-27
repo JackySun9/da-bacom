@@ -71,12 +71,24 @@ export default class BentoGrid {
   }
 
   /**
+   * The responsive view matching the current viewport (block CSS breakpoints:
+   * mobile < 600px, tablet 600–1199px, desktop >= 1200px).
+   */
+  async activeView() {
+    const width = (await this.page.viewportSize())?.width ?? 1440;
+    if (width < 600) return this.viewMobile;
+    if (width < 1200) return this.viewTablet;
+    return this.viewDesktop;
+  }
+
+  /**
    * Wait until the block has finished decorating (foreground + a rendered view).
    */
   async waitForReady() {
     await this.block.waitFor({ state: 'attached' });
     await this.foreground.waitFor({ state: 'visible' });
-    await this.gridItems.first().waitFor({ state: 'visible' });
+    const view = await this.activeView();
+    await view.locator('.grid-item').first().waitFor({ state: 'visible' });
   }
 
   /**
@@ -145,10 +157,12 @@ export default class BentoGrid {
   }
 
   /**
-   * Open the video modal by clicking the featured video bento.
+   * Open the video modal: the featured bento on tablet/desktop, the first video
+   * card on mobile (the mobile view has no separate featured card).
    */
   async openFeaturedVideo() {
-    await this.featured.click();
+    const view = await this.activeView();
+    await view.locator('.bento-featured, .grid-item.has-video').first().click();
     await this.modal.waitFor({ state: 'visible' });
     await this.modalVideo.waitFor({ state: 'attached' });
   }

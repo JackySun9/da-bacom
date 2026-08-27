@@ -29,13 +29,15 @@ test.describe('BACOM Bento Grid Block Test Suite', () => {
       await expect(bento.block).toHaveAttribute('aria-label', feature.expected.ariaLabel);
     });
 
-    await test.step('All three responsive views render; desktop is the visible one', async () => {
+    await test.step('All three responsive views render; the viewport-appropriate one is visible', async () => {
       await expect(bento.viewMobile).toBeAttached();
       await expect(bento.viewTablet).toBeAttached();
       await expect(bento.viewDesktop).toBeAttached();
-      await expect(bento.viewDesktop).toBeVisible();
-      await expect(bento.viewMobile).toBeHidden();
-      await expect(bento.viewTablet).toBeHidden();
+      const view = await bento.activeView();
+      await expect(view).toBeVisible();
+      for (const other of [bento.viewMobile, bento.viewTablet, bento.viewDesktop].filter((v) => v !== view)) {
+        await expect(other).toBeHidden();
+      }
     });
 
     await test.step('Section header shows a heading and subtext', async () => {
@@ -46,21 +48,38 @@ test.describe('BACOM Bento Grid Block Test Suite', () => {
       expect(header.subtext, `section subtext (${header.source})`).not.toBe('');
     });
 
-    await test.step('Featured video bento renders as a clickable video card', async () => {
-      await expect(bento.featured).toBeVisible();
-      await expect(bento.featured).toHaveClass(/has-video/);
-      await expect(bento.featured).toHaveAttribute('href', /.+/);
-      await expect(bento.featuredHeading).not.toBeEmpty();
-      await expect(bento.featuredPlayIcon).toBeVisible();
-      await expect(bento.featuredWatchLink).toBeVisible();
-    });
+    if ((await page.viewportSize()).width >= 600) {
+      await test.step('Featured video bento renders as a clickable video card', async () => {
+        const view = await bento.activeView();
+        const featured = view.locator('.bento-featured');
+        await expect(featured).toBeVisible();
+        await expect(featured).toHaveClass(/has-video/);
+        await expect(featured).toHaveAttribute('href', /.+/);
+        await expect(featured.locator('.bento-heading')).not.toBeEmpty();
+        await expect(featured.locator('.grid-item-play')).toBeVisible();
+        await expect(featured.locator('.bento-watch-link')).toBeVisible();
+      });
+    } else {
+      await test.step('Mobile: the carousel leads with a video card (no separate featured)', async () => {
+        const view = await bento.activeView();
+        const first = view.locator('.grid-item').first();
+        await expect(first).toHaveClass(/has-video/);
+        await expect(first.locator('.bento-heading')).not.toBeEmpty();
+        await expect(first.locator('.grid-item-play')).toBeVisible();
+        await expect(first.locator('.bento-watch-link')).toBeVisible();
+      });
+    }
 
     await test.step('Carousel renders cards, each with a play icon and watch link', async () => {
-      const cardCount = await bento.gridItems.count();
+      const view = await bento.activeView();
+      const cardCount = await view.locator('.grid-carousel .grid-item').count();
       expect(cardCount).toBeGreaterThanOrEqual(feature.expected.minCards);
-      await expect(bento.gridItemPlayIcons).toHaveCount(cardCount);
-      await expect(bento.gridItemWatchLinks).toHaveCount(cardCount);
-      await expect(bento.controls).toBeVisible();
+      await expect(view.locator('.grid-carousel .grid-item .grid-item-play')).toHaveCount(cardCount);
+      await expect(view.locator('.grid-carousel .grid-item .bento-watch-link')).toHaveCount(cardCount);
+      // Arrow controls are a desktop affordance (mobile is swipe-based per QE AC).
+      if ((await bento.page.viewportSize()).width >= 1200) {
+        await expect(view.locator('.grid-carousel-controls')).toBeVisible();
+      }
     });
   });
 
@@ -106,20 +125,31 @@ test.describe('BACOM Bento Grid Block Test Suite', () => {
       await bento.waitForReady();
     });
 
-    await test.step('Prev arrow starts disabled, Next arrow is enabled', async () => {
-      await expect(bento.controls).toBeVisible();
-      await expect(bento.prevArrow).toBeDisabled();
-      await expect(bento.nextArrow).toBeEnabled();
-    });
+    if ((await page.viewportSize()).width >= 1200) {
+      await test.step('Prev arrow starts disabled, Next arrow is enabled', async () => {
+        await expect(bento.controls).toBeVisible();
+        await expect(bento.prevArrow).toBeDisabled();
+        await expect(bento.nextArrow).toBeEnabled();
+      });
 
-    await test.step('Clicking Next scrolls the carousel and enables Prev', async () => {
-      await bento.clickNext();
-      await expect(bento.prevArrow).toBeEnabled();
-    });
+      await test.step('Clicking Next scrolls the carousel and enables Prev', async () => {
+        await bento.clickNext();
+        await expect(bento.prevArrow).toBeEnabled();
+      });
 
-    await test.step('Clicking Prev scrolls back toward the start', async () => {
-      await bento.clickPrev();
-    });
+      await test.step('Clicking Prev scrolls back toward the start', async () => {
+        await bento.clickPrev();
+      });
+    } else {
+      await test.step('Below desktop: single swipeable carousel without arrows (QE AC)', async () => {
+        const view = await bento.activeView();
+        const info = await view.evaluate((v) => {
+          const container = v.querySelector('.grid-carousel-container');
+          return { overflows: container.scrollWidth > container.clientWidth + 4 };
+        });
+        expect(info.overflows, 'carousel content overflows (swipeable)').toBe(true);
+      });
+    }
   });
 
   test(`${findFeature('@bento-grid-responsive').name} ${findFeature('@bento-grid-responsive').tags}`, async ({ page, baseURL }) => {

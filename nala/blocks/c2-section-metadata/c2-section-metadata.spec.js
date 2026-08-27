@@ -12,7 +12,12 @@ module.exports = {
       path: '/drafts/slavin/iswa/iswa-v2/c2-blocks-parity?martech=off',
       description: 'Section-metadata style classes are applied to the owning section.',
       tags: '@c2-section-metadata @bacom @regression',
-      expected: { styleClasses: ['rounded-corners-bottom', 'wide', 'spacing-md-bottom'] },
+      expected: {
+        // The spacing class is responsive: spacing-md-bottom on desktop,
+        // spacing-xl-bottom on mobile.
+        styleClasses: ['rounded-corners-bottom', 'wide'],
+        spacingPattern: '^spacing-(md|xl)-bottom$',
+      },
     },
     {
       tcid: 'C2-02',

@@ -29,6 +29,13 @@ test.describe('BACOM C2 Section Metadata Block Test Suite', () => {
       await expect
         .poll(async () => c2.sectionClassList(), { timeout: 5000 })
         .toEqual(expect.arrayContaining(feature.expected.styleClasses));
+      // Spacing class is responsive (md desktop / xl mobile) — assert the variant.
+      const classes = await c2.sectionClassList();
+      const spacing = new RegExp(feature.expected.spacingPattern);
+      expect(
+        classes.some((c) => spacing.test(c)),
+        `a spacing-* bottom variant is applied, got: ${classes.join(' ')}`,
+      ).toBe(true);
     });
   });
 
