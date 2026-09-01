@@ -10,6 +10,9 @@ Combined test plan for the six ISWA blocks, all retargeted to the **stage dedica
 | [#198](https://github.com/adobecom/da-bacom/pull/198) | resource-showcase (net new) | [MWPW-202483](https://jira.corp.adobe.com/browse/MWPW-202483) | `nala/blocks/resource-showcase/` | ✅ 6 |
 | [#202](https://github.com/adobecom/da-bacom/pull/202) | c2-section-metadata (net new) | [MWPW-202513](https://jira.corp.adobe.com/browse/MWPW-202513) | `nala/blocks/c2-section-metadata/` | ✅ 2 |
 | [#205](https://github.com/adobecom/da-bacom/pull/205) | bacom-carousel-c2 (enh.) | [MWPW-202488](https://jira.corp.adobe.com/browse/MWPW-202488) | `nala/blocks/bacom-carousel-c2/` | ✅ 4 |
+| — | ISWA cross-cutting (page-level) | [204904](https://jira.corp.adobe.com/browse/MWPW-204904) · [205058](https://jira.corp.adobe.com/browse/MWPW-205058) · [205025](https://jira.corp.adobe.com/browse/MWPW-205025) · [205271](https://jira.corp.adobe.com/browse/MWPW-205271) | `nala/blocks/iswa-cross-cutting/` | ✅ 4 |
+
+**ISWA cross-cutting** (page-level, runs on the assembled Nala copy of the finished page `/drafts/nala/blocks/resources/it-starts-with-adobe`): `@iswa-footer-not-squished` (footer loads to full height, not the 40px squished state), `@iswa-nav-renders` (standard `global-navigation`), `@iswa-content-alignment` (blocks share a content-column left edge; centered blocks have equal margins), `@iswa-mobile-marquee-full-width` (mobile marquee flush to both edges, no right gutter). The Target/experiment half of 205271 (nav/footer must not revert to C2 when Target is on) needs Target enabled and is left to **manual**.
 
 **Target pages (stage) — dedicated block pages by default, integration page via env:**
 

@@ -37,7 +37,7 @@ module.exports = {
       tcid: 'BENTO-04',
       name: '@bento-grid-responsive',
       path: pagePath('/drafts/nala/blocks/bento-grid/bento-grid?martech=off'),
-      description: 'Desktop shows featured + carousel; mobile collapses to a single full carousel (no arrow controls).',
+      description: 'Desktop shows featured + carousel; mobile collapses to a single carousel with arrow controls.',
       tags: '@bento-grid @bacom @regression',
     },
     {
@@ -51,7 +51,7 @@ module.exports = {
       tcid: 'BENTO-06',
       name: '@bento-grid-partial-vs-full',
       path: pagePath('/drafts/nala/blocks/bento-grid/bento-grid?martech=off'),
-      description: 'AC: desktop is a partial carousel (overflows and peeks the next card); mobile is a full-width single carousel.',
+      description: 'AC: desktop is a partial carousel (overflows, multiple cards visible); mobile is a full-width single carousel with arrow controls.',
       tags: '@bento-grid @bacom @regression',
     },
     {
