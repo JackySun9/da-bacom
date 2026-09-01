@@ -236,6 +236,10 @@
   border-radius: 16px;
 }
 
+.bento-grid .grid-item:last-of-type {
+  margin-right: calc(100% - 82vw);
+}
+
 .bento-grid .grid-item-media {
   position: relative;
   border-radius: 16px;
@@ -295,6 +299,7 @@
   justify-content: flex-end;
   gap: 0.5rem;
   margin-top: 1rem;
+  padding-right: calc(100% - 82vw - 24px);
 }
 
 .bento-grid .grid-carousel-arrow {
@@ -397,6 +402,10 @@
 
   .bento-grid .grid-carousel-container {
     padding-left: 0;
+  }
+
+  .bento-grid .grid-carousel-controls {
+    padding-right: 0;
   }
 
   .bento-grid .grid-item {
